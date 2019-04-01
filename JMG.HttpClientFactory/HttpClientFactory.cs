@@ -18,11 +18,11 @@ namespace JMG.HttpClientFactory
 
         }
 
-        public void Setup<THttpClient>(Func<HttpMessageHandler, THttpClient> clientBuilder, Func<HttpMessageHandler> handlerBuilder) where THttpClient : HttpClient
+        public void Setup<THttpClient>(Func<HttpMessageHandler, THttpClient> clientBuilder, Func<HttpMessageHandler> handlerBuilder, HandlerPolicy policy) where THttpClient : HttpClient
         {
             _instaceManagers.Add(
                 InstanceKey<THttpClient>(),
-                new InstanceManager(clientBuilder, handlerBuilder)
+                new InstanceManager(clientBuilder, handlerBuilder, policy)
                 );
         }
 
@@ -36,7 +36,7 @@ namespace JMG.HttpClientFactory
             return typeof(THttpClient).FullName;
         }
 
-        public THttpClient Setup<THttpClient>() where THttpClient : HttpClient
+        public THttpClient Build<THttpClient>() where THttpClient : HttpClient
         {
             var key = InstanceKey<THttpClient>();
             var instanceManager = _instaceManagers[key];

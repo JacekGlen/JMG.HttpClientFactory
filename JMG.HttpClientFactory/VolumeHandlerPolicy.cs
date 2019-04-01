@@ -19,12 +19,12 @@ namespace JMG.HttpClientFactory
             this.maxCallsPerInstance = maxCallsPerInstance;
         }
 
-        public override IHandlerExpiration StartExpiration()
+        public override IHandlerExpirationMonitor StartExpirationMonitor()
         {
-            throw new NotImplementedException();
+            return new VolumeHandlerExpiration(this.maxCallsPerInstance);
         }
 
-        private class VolumeHandlerExpiration : IHandlerExpiration
+        private class VolumeHandlerExpiration : IHandlerExpirationMonitor
         {
             private readonly long _maxCallsPerInstance;
             private long _callsCount;
@@ -37,7 +37,7 @@ namespace JMG.HttpClientFactory
 
             public bool IsExpired()
             {
-                throw new NotImplementedException();
+                return _callsCount++ > _maxCallsPerInstance;
             }
         }
     }

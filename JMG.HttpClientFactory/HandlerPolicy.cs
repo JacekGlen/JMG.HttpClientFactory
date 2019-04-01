@@ -18,6 +18,6 @@ namespace JMG.HttpClientFactory
 
         public int PoolSize { get; }
 
-        public abstract IHandlerExpiration StartExpiration();
+        public abstract IHandlerExpirationMonitor StartExpirationMonitor();
     }
 }

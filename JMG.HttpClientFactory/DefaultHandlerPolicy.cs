@@ -11,12 +11,12 @@ namespace JMG.HttpClientFactory
         {
         }
 
-        public override IHandlerExpiration StartExpiration()
+        public override IHandlerExpirationMonitor StartExpirationMonitor()
         {
             return new DefaultHandlerExpiration();
         }
 
-        private class DefaultHandlerExpiration : IHandlerExpiration
+        private class DefaultHandlerExpiration : IHandlerExpirationMonitor
         {
             public bool IsExpired()
             {

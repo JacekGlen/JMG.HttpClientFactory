@@ -19,12 +19,12 @@ namespace JMG.HttpClientFactory
             this.timeToExpire = timeToExpire;
         }
 
-        public override IHandlerExpiration StartExpiration()
+        public override IHandlerExpirationMonitor StartExpirationMonitor()
         {
             return new SlidingHandlerExpiration(timeToExpire);
         }
 
-        private class SlidingHandlerExpiration:IHandlerExpiration
+        private class SlidingHandlerExpiration:IHandlerExpirationMonitor
         {
             private readonly DateTime expiresAt;
 
