@@ -20,9 +20,9 @@ namespace JMG.HttpClientFactory
 
         private readonly object handlerBuilderLock = new object();
 
-        public InstanceManager(Func<HttpMessageHandler, HttpClient> builder, Func<HttpMessageHandler> handlerBuilder, HandlerPolicy policy)
+        public InstanceManager(Func<HttpMessageHandler, HttpClient> clientBuilder, Func<HttpMessageHandler> handlerBuilder, HandlerPolicy policy)
         {
-            _clientBuilder = builder;
+            _clientBuilder = clientBuilder;
             _handlerBuilder = handlerBuilder;
             this.policy = policy;
 
@@ -30,11 +30,10 @@ namespace JMG.HttpClientFactory
 
             for (int i = 0; i < policy.PoolSize; ++i)
             {
-                var nextContainerIndex = i == policy.PoolSize ?
+                var nextContainerIndex = i + 1 == policy.PoolSize ?
                     0 :
-                    i;
-
-                ActivePool[i] = new HttpMessageHandlerContainer(_handlerBuilder(), policy.StartExpirationMonitor(), nextContainerIndex);
+                    i + 1;
+                ActivePool.Add(new HttpMessageHandlerContainer(_handlerBuilder, policy, nextContainerIndex));
             }
 
             _currentHandlerIndex = 0;
@@ -43,18 +42,8 @@ namespace JMG.HttpClientFactory
         public HttpClient Build()
         {
             HttpMessageHandler httpMessageHandler;
-
-            lock (handlerBuilderLock)
-            {
-                if (ActivePool[_currentHandlerIndex].IsExpired())
-                {
-                    ActivePool[_currentHandlerIndex] = new HttpMessageHandlerContainer(_handlerBuilder(), policy.StartExpirationMonitor(), ActivePool[_currentHandlerIndex].NextContainerIndex);
-                }
-
-                httpMessageHandler = ActivePool[_currentHandlerIndex].Handler;
-                _currentHandlerIndex = ActivePool[_currentHandlerIndex].NextContainerIndex;
-            }
-
+            httpMessageHandler = ActivePool[_currentHandlerIndex].Get();
+            _currentHandlerIndex = ActivePool[_currentHandlerIndex].NextContainerIndex;
 
             return _clientBuilder(httpMessageHandler);
         }

@@ -24,19 +24,28 @@ namespace JMG.HttpClientFactory
             return new SlidingHandlerExpiration(timeToExpire);
         }
 
-        private class SlidingHandlerExpiration:IHandlerExpirationMonitor
+        private class SlidingHandlerExpiration : IHandlerExpirationMonitor
         {
-            private readonly DateTime expiresAt;
+            private DateTime expiresAt;
+            private readonly TimeSpan timeToExpire;
 
             public SlidingHandlerExpiration(TimeSpan timeToExpire)
             {
-
+                this.timeToExpire = timeToExpire;
                 this.expiresAt = DateTime.UtcNow.Add(timeToExpire);
             }
 
             public bool IsExpired()
             {
-                return DateTime.UtcNow > expiresAt;
+                if (DateTime.UtcNow > expiresAt)
+                {
+                    return true;
+                }
+                else
+                {
+                    this.expiresAt = DateTime.UtcNow.Add(timeToExpire);
+                    return false;
+                }
             }
         }
     }

@@ -37,7 +37,7 @@ namespace JMG.HttpClientFactory
 
             public bool IsExpired()
             {
-                return _callsCount++ > _maxCallsPerInstance;
+                return ++_callsCount > _maxCallsPerInstance;
             }
         }
     }

@@ -7,23 +7,48 @@ using System.Threading.Tasks;
 
 namespace JMG.HttpClientFactory
 {
-    public class HttpMessageHandlerContainer 
+    public class HttpMessageHandlerContainer
     {
-        private readonly IHandlerExpirationMonitor monitor;
+        private IHandlerExpirationMonitor _monitor;
+        private HttpMessageHandler _handler;
+        private readonly Func<HttpMessageHandler> _handlerBuilder;
+        private readonly HandlerPolicy _handlerPolicy;
+        private Object _builderLock = new object();
 
-        public HttpMessageHandlerContainer(HttpMessageHandler handler, IHandlerExpirationMonitor monitor, int nextContainerIndex)
+        public HttpMessageHandlerContainer(Func<HttpMessageHandler> handlerBuilder, HandlerPolicy handlerPolicy, int nextContainerIndex)
         {
-            Handler = handler;
-            this.monitor = monitor;
+            _handlerBuilder = handlerBuilder;
+            _handlerPolicy = handlerPolicy;
             NextContainerIndex = nextContainerIndex;
+
+            _handler = _handlerBuilder();
+            _monitor = _handlerPolicy.StartExpirationMonitor();
         }
 
-        public HttpMessageHandler Handler { get; }
         public int NextContainerIndex { get; }
 
-        public bool IsExpired()
+        private bool IsExpired()
         {
-            return Handler == null || monitor.IsExpired();
+            return _handler == null || _monitor.IsExpired();
+        }
+
+        public HttpMessageHandler Get()
+        {
+
+            if (IsExpired())
+            {
+                lock (_builderLock)
+                {
+                    if (IsExpired())
+                    {
+                        _handler.Dispose();
+                        _handler = _handlerBuilder();
+                        _monitor = _handlerPolicy.StartExpirationMonitor();
+                    }
+                }
+            }
+
+            return _handler;
         }
     }
 }
