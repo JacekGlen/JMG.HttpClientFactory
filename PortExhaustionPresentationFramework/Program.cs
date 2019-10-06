@@ -17,11 +17,11 @@ namespace PortExhaustionPresentationFramework
             var exec = new HttpClientExecutor();
 
             //exec.RunNewInstancePerRequest(10).Wait();
-            //            exec.RunNewInstancePerRequest(100000).Wait();
+            //exec.RunNewInstancePerRequest(100000).Wait();
             //exec.RunNewInstancePerRequestWithDispose(10).Wait();
-            //exec.RunNewInstancePerRequestWithDispose(100000).Wait();
+            exec.RunNewInstancePerRequestWithDispose(100000).Wait();
+            //            exec.RunSingleInstance(100000).Wait();
 
-            exec.RunSingleInstance(100000).Wait();
             Console.WriteLine("hey I'm done!");
             Console.ReadLine();
         }
@@ -65,13 +65,13 @@ namespace PortExhaustionPresentationFramework
     {
         public async Task RunNewInstancePerRequest(int iterations = 100)
         {
-            for (int i = 1; i < iterations; ++i)
+            for (int i = 1; i <= iterations; ++i)
             {
                 try
                 {
                     var client = new HttpClient();
                     var result = await client.GetAsync("http://localhost:3070");
-                    Console.WriteLine("request complete");
+                    Console.WriteLine("request complete: " + i);
                 }
                 catch (HttpRequestException ex)
                 {
@@ -88,14 +88,14 @@ namespace PortExhaustionPresentationFramework
 
         public async Task RunNewInstancePerRequestWithDispose(int iterations = 100)
         {
-            for (int i = 1; i < iterations; ++i)
+            for (int i = 1; i <= iterations; ++i)
             {
                 try
                 {
                     using (var client = new HttpClient())
                     {
                         var result = await client.GetAsync("http://localhost:3070");
-                        Console.WriteLine("request complete");
+                        Console.WriteLine("request complete: " + i);
                     }
                 }
                 catch (HttpRequestException ex)
@@ -113,13 +113,13 @@ namespace PortExhaustionPresentationFramework
         public async Task RunSingleInstance(int iterations = 100)
         {
             var client = new HttpClient();
-            for (int i = 1; i < iterations; ++i)
+            for (int i = 1; i <= iterations; ++i)
 
             {
                 try
                 {
                     var result = await client.GetAsync("http://localhost:3070");
-                    Console.WriteLine("request complete");
+                    Console.WriteLine("request complete: " + i);
                 }
                 catch (HttpRequestException ex)
                 {
