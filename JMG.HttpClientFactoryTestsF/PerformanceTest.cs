@@ -16,16 +16,18 @@ namespace JMG.HttpClientFactoryTestsF
         public void SingleThreadInstanceInvokingShouldBeNotMuchSlowerThanDefaultHttpClient()
         {
             var timer = new Stopwatch();
+            var repetitionCount = 1000000;
 
             Action a = () => { new HttpClient(); };
 
             a();
 
             timer.Start();
-            SingleThreadRepetition(a, 1000);
+            SingleThreadRepetition(a, repetitionCount);
             timer.Stop();
 
-            TestContext.WriteLine($"HttpClient executed in {timer.Elapsed}");
+            var orignalClientCreatingTime = timer.Elapsed;
+            TestContext.WriteLine($"HttpClient executed in {orignalClientCreatingTime}");
 
             var sut = new HttpClientFactory.HttpClientFactory();
 
@@ -37,11 +39,13 @@ namespace JMG.HttpClientFactoryTestsF
 
             timer.Reset();
             timer.Start();
-            SingleThreadRepetition(b, 1000);
+            SingleThreadRepetition(b, repetitionCount);
             timer.Stop();
 
-            TestContext.WriteLine($"HttpClientFactory executed in {timer.Elapsed}");
+            var factoryClientCreationTime = timer.Elapsed;
+            TestContext.WriteLine($"HttpClientFactory executed in {factoryClientCreationTime}");
 
+////            var ratio = factoryClientCreationTime / orignalClientCreatingTime;
         }
 
         public void SingleThreadRepetition(Action a, long numberOfRepetitions)
