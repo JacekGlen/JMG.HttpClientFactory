@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 
 namespace PortExhaustionPresentationFramework
 {
@@ -16,13 +15,10 @@ namespace PortExhaustionPresentationFramework
             var server = new Server();
             var exec = new HttpClientExecutor();
 
-            //exec.RunNewInstancePerRequest(10).Wait();
-            //exec.RunNewInstancePerRequest(100000).Wait();
-            //exec.RunNewInstancePerRequestWithDispose(10).Wait();
-            exec.RunNewInstancePerRequestWithDispose(100000).Wait();
-            //            exec.RunSingleInstance(100000).Wait();
+            //exec.Run(exec.Request, 10).Wait();
+            //exec.Run(exec.RequestAndDispose, 100000).Wait();
 
-            Console.WriteLine("hey I'm done!");
+            Console.WriteLine("Hey, I'm done with " + exec.errorsCount + " errors");
             Console.ReadLine();
         }
     }
@@ -63,76 +59,56 @@ namespace PortExhaustionPresentationFramework
 
     public class HttpClientExecutor
     {
-        public async Task RunNewInstancePerRequest(int iterations = 100)
+        public int errorsCount = 0;
+
+        public async Task Run(Func<Task> method, int iterationsCount = 10)
         {
-            for (int i = 1; i <= iterations; ++i)
+            errorsCount = 0;
+            for (int i = 1; i <= iterationsCount; ++i)
             {
                 try
                 {
-                    var client = new HttpClient();
-                    var result = await client.GetAsync("http://localhost:3070");
-                    Console.WriteLine("request complete: " + i);
+                    await method();
+                    Console.WriteLine("Request complete: " + i);
                 }
                 catch (HttpRequestException ex)
                 {
-                    Console.WriteLine("Error: " + ex.Message);
+                    errorsCount++;
+                    Console.WriteLine("Error when executing request " + i + ": " + ex.Message);
                     if (ex.InnerException != null)
                     {
                         Console.WriteLine("\tInner Exception: " + ex.InnerException.Message);
                     }
                 }
             }
-
-            return;
         }
 
-        public async Task RunNewInstancePerRequestWithDispose(int iterations = 100)
-        {
-            for (int i = 1; i <= iterations; ++i)
-            {
-                try
-                {
-                    using (var client = new HttpClient())
-                    {
-                        var result = await client.GetAsync("http://localhost:3070");
-                        Console.WriteLine("request complete: " + i);
-                    }
-                }
-                catch (HttpRequestException ex)
-                {
-                    Console.WriteLine("Error: " + ex.Message);
-                    if (ex.InnerException != null)
-                    {
-                        Console.WriteLine("\tInner Exception: " + ex.InnerException.Message);
-                    }
-                }
-            }
+        private string url = "http://localhost:3070";
 
-            return;
-        }
-        public async Task RunSingleInstance(int iterations = 100)
+        #region Request
+        public async Task Request()
         {
             var client = new HttpClient();
-            for (int i = 1; i <= iterations; ++i)
-
-            {
-                try
-                {
-                    var result = await client.GetAsync("http://localhost:3070");
-                    Console.WriteLine("request complete: " + i);
-                }
-                catch (HttpRequestException ex)
-                {
-                    Console.WriteLine("Error: " + ex.Message);
-                    if (ex.InnerException != null)
-                    {
-                        Console.WriteLine("\tInner Exception: " + ex.InnerException.Message);
-                    }
-                }
-            }
-
-            return;
+            var result = await client.GetAsync(url);
         }
+        #endregion
 
+        #region RequestAndDispose
+        public async Task RequestAndDispose()
+        {
+            using (var client = new HttpClient())
+            {
+                var result = await client.GetAsync(url);
+            }
+        }
+        #endregion
+
+        #region Request optimized
+        private static HttpClient client = new HttpClient();
+        public async Task RequestWithStatic()
+        {
+            var result = await client.GetAsync(url);
+        }
+        #endregion
     }
 }
