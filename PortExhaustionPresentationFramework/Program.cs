@@ -16,7 +16,7 @@ namespace PortExhaustionPresentationFramework
             var exec = new HttpClientExecutor();
 
             //exec.Run(exec.Request, 10).Wait();
-            //exec.Run(exec.RequestAndDispose, 100000).Wait();
+            //exec.Run(exec.RequestAndDispose, 10).Wait();
 
             Console.WriteLine("Hey, I'm done with " + exec.errorsCount + " errors");
             Console.ReadLine();
@@ -46,7 +46,7 @@ namespace PortExhaustionPresentationFramework
             var context = listener.EndGetContext(ar);
             listener.BeginGetContext(Callback, null);
             var now = DateTime.UtcNow;
-            var responseStr = String.Format("<html><body>It's a request!");
+            var responseStr = String.Format("<html><body>It's a page!</body></html>");
             byte[] buffer = Encoding.UTF8.GetBytes(responseStr);
             var response = context.Response;
             response.ContentType = "text/html";
