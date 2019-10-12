@@ -15,15 +15,15 @@ namespace JMG.HttpClientFactoryTestsF
         [Test]
         public void PolicyExpiriesAfterNumberOfChecksExceedsVolume()
         {
-            var sut = new VolumeHandlerPolicy(5);
-            var monitor = sut.StartExpirationMonitor();
+            var sut = new CountExpirationPolicy(5);
 
-            Assert.IsFalse(monitor.IsExpired());
-            Assert.IsFalse(monitor.IsExpired());
-            Assert.IsFalse(monitor.IsExpired());
-            Assert.IsFalse(monitor.IsExpired());
-            Assert.IsFalse(monitor.IsExpired());
-            Assert.IsTrue(monitor.IsExpired());
+            Assert.IsFalse(sut.HandlerExpired());
+            Assert.IsFalse(sut.HandlerExpired());
+            Assert.IsFalse(sut.HandlerExpired());
+            Assert.IsFalse(sut.HandlerExpired());
+            Assert.IsFalse(sut.HandlerExpired());
+            Assert.IsTrue(sut.HandlerExpired());
+            Assert.IsFalse(sut.HandlerExpired());
         }
     }
 }

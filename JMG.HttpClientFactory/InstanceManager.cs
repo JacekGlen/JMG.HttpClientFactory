@@ -9,43 +9,30 @@ namespace JMG.HttpClientFactory
 {
     public class InstanceManager
     {
-        public Func<HttpClient> GetClient { get; set; }
-        private readonly List<HttpMessageHandlerContainer> ActivePool;
-
         private readonly Func<HttpMessageHandler, HttpClient> _clientBuilder;
         private readonly Func<HttpMessageHandler> _handlerBuilder;
-        private readonly HandlerPolicy policy;
+        private readonly IExpirationPolicy _hanndlerPolicy;
+        private HttpMessageHandler _handler;
 
-        private int _currentHandlerIndex;
-
-        private readonly object handlerBuilderLock = new object();
-
-        public InstanceManager(Func<HttpMessageHandler, HttpClient> clientBuilder, Func<HttpMessageHandler> handlerBuilder, HandlerPolicy policy)
+        public InstanceManager(Func<HttpMessageHandler, HttpClient> clientBuilder, Func<HttpMessageHandler> handlerBuilder, IExpirationPolicy policy)
         {
             _clientBuilder = clientBuilder;
             _handlerBuilder = handlerBuilder;
-            this.policy = policy;
+            _hanndlerPolicy = policy;
 
-            ActivePool = new List<HttpMessageHandlerContainer>(policy.PoolSize);
-
-            for (int i = 0; i < policy.PoolSize; ++i)
-            {
-                var nextContainerIndex = i + 1 == policy.PoolSize ?
-                    0 :
-                    i + 1;
-                ActivePool.Add(new HttpMessageHandlerContainer(_handlerBuilder, policy, nextContainerIndex));
-            }
-
-            _currentHandlerIndex = 0;
+            _handler = handlerBuilder();
         }
 
         public HttpClient Build()
         {
-            HttpMessageHandler httpMessageHandler;
-            httpMessageHandler = ActivePool[_currentHandlerIndex].Get();
-            _currentHandlerIndex = ActivePool[_currentHandlerIndex].NextContainerIndex;
+            if (_hanndlerPolicy.HandlerExpired())
+            {
+                _handler = _handlerBuilder();
+            }
 
-            return _clientBuilder(httpMessageHandler);
+            var httpClient = _clientBuilder(_handler);
+
+            return httpClient;
         }
 
         public static InstanceManager Default

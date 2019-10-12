@@ -4,24 +4,11 @@ using System.Text;
 
 namespace JMG.HttpClientFactory
 {
-    public class DefaultHandlerPolicy : HandlerPolicy
+    public class DefaultHandlerPolicy : IExpirationPolicy
     {
-        public DefaultHandlerPolicy(int poolSize = 1)
-            : base(poolSize)
+        public bool HandlerExpired()
         {
-        }
-
-        public override IHandlerExpirationMonitor StartExpirationMonitor()
-        {
-            return new DefaultHandlerExpiration();
-        }
-
-        private class DefaultHandlerExpiration : IHandlerExpirationMonitor
-        {
-            public bool IsExpired()
-            {
-                return false;
-            }
+            return false;
         }
     }
 }

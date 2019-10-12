@@ -4,8 +4,8 @@ using System.Text;
 
 namespace JMG.HttpClientFactory
 {
-    public interface IHandlerExpirationMonitor
+    public interface IExpirationPolicy
     {
-        bool IsExpired();
+        bool HandlerExpired();
     }
 }

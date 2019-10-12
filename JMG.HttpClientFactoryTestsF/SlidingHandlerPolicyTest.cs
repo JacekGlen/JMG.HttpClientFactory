@@ -16,13 +16,30 @@ namespace JMG.HttpClientFactoryTestsF
         [Test]
         public void PolicyExpiriesAfterTimeSpan()
         {
-            var sut = new SlidingHandlerPolicy(TimeSpan.FromSeconds(2));
-            var monitor = sut.StartExpirationMonitor();
+            var sut = new SlidingExpirationPolicy(TimeSpan.FromSeconds(2));
 
-            Assert.IsFalse(monitor.IsExpired());
+            Assert.IsFalse(sut.HandlerExpired());
 
             Thread.Sleep(2100);
-            Assert.IsTrue(monitor.IsExpired());
+
+            Assert.IsTrue(sut.HandlerExpired());
+        }
+
+        [Test]
+        public void PolicyDoesntExpireIfCallWithingTimeWindow()
+        {
+            var sut = new SlidingExpirationPolicy(TimeSpan.FromSeconds(2));
+
+            Assert.IsFalse(sut.HandlerExpired());
+
+            Thread.Sleep(1000);
+            Assert.IsFalse(sut.HandlerExpired());
+
+            Thread.Sleep(1000);
+            Assert.IsFalse(sut.HandlerExpired());
+
+            Thread.Sleep(1000);
+            Assert.IsFalse(sut.HandlerExpired());
         }
     }
 }

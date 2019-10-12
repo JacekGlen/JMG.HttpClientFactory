@@ -45,7 +45,8 @@ namespace JMG.HttpClientFactoryTestsF
             var factoryClientCreationTime = timer.Elapsed;
             TestContext.WriteLine($"HttpClientFactory executed in {factoryClientCreationTime}");
 
-////            var ratio = factoryClientCreationTime / orignalClientCreatingTime;
+            var ratio = factoryClientCreationTime.TotalMilliseconds / orignalClientCreatingTime.TotalMilliseconds;
+            TestContext.WriteLine($"HttpClientFactory executed in {ratio:P}");
         }
 
         public void SingleThreadRepetition(Action a, long numberOfRepetitions)

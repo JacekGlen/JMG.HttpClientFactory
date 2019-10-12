@@ -10,15 +10,10 @@ namespace JMG.HttpClientFactory
     {
         private static readonly Dictionary<string, InstanceManager> _instaceManagers = new Dictionary<string, InstanceManager>
         {
-             {  "", InstanceManager.Default }
+             {  String.Empty, InstanceManager.Default }
         };
 
-        public HttpClientFactory()
-        {
-
-        }
-
-        public void Setup<THttpClient>(Func<HttpMessageHandler, THttpClient> clientBuilder, Func<HttpMessageHandler> handlerBuilder, HandlerPolicy policy) where THttpClient : HttpClient
+        public void Setup<THttpClient>(Func<HttpMessageHandler, THttpClient> clientBuilder, Func<HttpMessageHandler> handlerBuilder, IExpirationPolicy policy) where THttpClient : HttpClient
         {
             _instaceManagers.Add(
                 InstanceKey<THttpClient>(),
@@ -26,14 +21,14 @@ namespace JMG.HttpClientFactory
                 );
         }
 
-        public HttpClient Build()
-        {
-            return _instaceManagers[""].Build();
-        }
-
         private string InstanceKey<THttpClient>() where THttpClient : HttpClient
         {
             return typeof(THttpClient).FullName;
+        }
+
+        public HttpClient Build()
+        {
+            return _instaceManagers[String.Empty].Build();
         }
 
         public THttpClient Build<THttpClient>() where THttpClient : HttpClient

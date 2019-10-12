@@ -16,11 +16,10 @@ namespace JMG.HttpClientFactoryTestsF
         public void PolicyNeverExpiries()
         {
             var sut = new DefaultHandlerPolicy();
-            var monitor = sut.StartExpirationMonitor();
 
             for (int i = 0; i < 1000; ++i)
             {
-                Assert.IsFalse(monitor.IsExpired());
+                Assert.IsFalse(sut.HandlerExpired());
             }
         }
     }
