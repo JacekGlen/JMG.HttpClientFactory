@@ -39,7 +39,7 @@ namespace JMG.HttpClientFactory
         {
             get
             {
-                return new InstanceManager((handler) => new HttpClient(handler), () => new HttpClientHandler(), new DefaultHandlerPolicy());
+                return new InstanceManager((handler) => new HttpClient(handler, false), () => new HttpClientHandler(), new DefaultHandlerPolicy());
             }
         }
     }

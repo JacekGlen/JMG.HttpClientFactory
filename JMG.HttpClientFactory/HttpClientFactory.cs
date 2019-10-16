@@ -6,7 +6,7 @@ using System.Text;
 namespace JMG.HttpClientFactory
 {
 
-    public class HttpClientFactory
+    public class HttpClientFactory : IHttpClientFactory
     {
         private static readonly Dictionary<string, InstanceManager> _instaceManagers = new Dictionary<string, InstanceManager>
         {
@@ -15,15 +15,49 @@ namespace JMG.HttpClientFactory
 
         public void Setup<THttpClient>(Func<HttpMessageHandler, THttpClient> clientBuilder, Func<HttpMessageHandler> handlerBuilder, IExpirationPolicy policy) where THttpClient : HttpClient
         {
-            _instaceManagers.Add(
-                InstanceKey<THttpClient>(),
-                new InstanceManager(clientBuilder, handlerBuilder, policy)
-                );
+            _instaceManagers[InstanceKey<THttpClient>()] = new InstanceManager(clientBuilder, handlerBuilder, policy);
+        }
+
+        public void Setup<THttpClient>(Func<HttpMessageHandler, THttpClient> clientBuilder, IExpirationPolicy policy) where THttpClient : HttpClient
+        {
+            _instaceManagers[InstanceKey<THttpClient>()] = new InstanceManager(clientBuilder, DefaultHttpMessageHandlerBuilder, policy);
+        }
+
+        public void Setup<THttpClient>(IExpirationPolicy policy) where THttpClient : HttpClient
+        {
+            var clientBuilder = CreateHttpClientBuilder<THttpClient>();
+            _instaceManagers[InstanceKey<THttpClient>()] = new InstanceManager(clientBuilder, DefaultHttpMessageHandlerBuilder, policy);
+        }
+
+        public void Setup<THttpClient>(Func<HttpMessageHandler> handlerBuilder, IExpirationPolicy policy) where THttpClient : HttpClient
+        {
+            var clientBuilder = CreateHttpClientBuilder<THttpClient>();
+            _instaceManagers[InstanceKey<THttpClient>()] = new InstanceManager(clientBuilder, handlerBuilder, policy);
+        }
+
+        public void Setup(string namedInstance, Func<HttpMessageHandler, HttpClient> clientBuilder, Func<HttpMessageHandler> handlerBuilder, IExpirationPolicy policy)
+        {
+            _instaceManagers[InstanceKey(namedInstance)] = new InstanceManager(clientBuilder, handlerBuilder, policy);
+        }
+
+        public void Setup(string namedInstance, Func<HttpMessageHandler, HttpClient> clientBuilder, IExpirationPolicy policy)
+        {
+            _instaceManagers[InstanceKey(namedInstance)] = new InstanceManager(clientBuilder, DefaultHttpMessageHandlerBuilder, policy);
+        }
+
+        public void Setup(string namedInstance, IExpirationPolicy policy)
+        {
+            _instaceManagers[InstanceKey(namedInstance)] = new InstanceManager(DefaultHttpClientBuilder, DefaultHttpMessageHandlerBuilder, policy);
         }
 
         private string InstanceKey<THttpClient>() where THttpClient : HttpClient
         {
-            return typeof(THttpClient).FullName;
+            return "Type:" + typeof(THttpClient).FullName;
+        }
+
+        private string InstanceKey(string namedInstance)
+        {
+            return "NamedInstance:" + namedInstance;
         }
 
         public HttpClient Build()
@@ -37,6 +71,41 @@ namespace JMG.HttpClientFactory
             var instanceManager = _instaceManagers[key];
 
             return (THttpClient)instanceManager.Build();
+        }
+
+        public HttpClient Build(string namedInstance)
+        {
+            var key = InstanceKey(namedInstance);
+            var instanceManager = _instaceManagers[key];
+
+            return instanceManager.Build();
+        }
+
+        private HttpMessageHandler DefaultHttpMessageHandlerBuilder()
+        {
+            return new HttpClientHandler();
+        }
+
+        private HttpClient DefaultHttpClientBuilder(HttpMessageHandler httpClientHandler)
+        {
+            return new HttpClient(httpClientHandler, false);
+        }
+
+        private Func<HttpMessageHandler, THttpClient> CreateHttpClientBuilder<THttpClient>() where THttpClient : HttpClient
+        {
+            var constructurWithHandler = typeof(THttpClient).GetConstructor(new[] { typeof(HttpMessageHandler) });
+
+            if (constructurWithHandler == null)
+            {
+                throw new ArgumentException($"The type {typeof(THttpClient).FullName} does not have constructor that takes HttpMessageHandler as a parameter.");
+            }
+
+            Func<HttpMessageHandler, THttpClient> builder = (handler) =>
+            {
+                return constructurWithHandler.Invoke(new[] { handler }) as THttpClient;
+            };
+
+            return builder;
         }
     }
 }

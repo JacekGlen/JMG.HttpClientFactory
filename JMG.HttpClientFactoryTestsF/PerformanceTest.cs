@@ -19,7 +19,6 @@ namespace JMG.HttpClientFactoryTestsF
             var repetitionCount = 1000000;
 
             Action a = () => { new HttpClient(); };
-
             a();
 
             timer.Start();
@@ -27,15 +26,13 @@ namespace JMG.HttpClientFactoryTestsF
             timer.Stop();
 
             var orignalClientCreatingTime = timer.Elapsed;
-            TestContext.WriteLine($"HttpClient executed in {orignalClientCreatingTime}");
+            TestContext.WriteLine($"HttpClient instance creation executed in {orignalClientCreatingTime}");
 
             var sut = new HttpClientFactory.HttpClientFactory();
-
-            sut.Setup<HttpClient>((h) => new HttpClient(h, false), () => new HttpClientHandler(), new DefaultHandlerPolicy());
-
             sut.Build();
 
             Action b = () => { sut.Build(); };
+            b();
 
             timer.Reset();
             timer.Start();
@@ -43,10 +40,10 @@ namespace JMG.HttpClientFactoryTestsF
             timer.Stop();
 
             var factoryClientCreationTime = timer.Elapsed;
-            TestContext.WriteLine($"HttpClientFactory executed in {factoryClientCreationTime}");
+            TestContext.WriteLine($"HttpClientFactory instance creation executed in {factoryClientCreationTime}");
 
             var ratio = factoryClientCreationTime.TotalMilliseconds / orignalClientCreatingTime.TotalMilliseconds;
-            TestContext.WriteLine($"HttpClientFactory executed in {ratio:P}");
+            TestContext.WriteLine($"HttpClientFactory instance creation executed in {ratio:P} of  standard HtpClient");
         }
 
         public void SingleThreadRepetition(Action a, long numberOfRepetitions)
