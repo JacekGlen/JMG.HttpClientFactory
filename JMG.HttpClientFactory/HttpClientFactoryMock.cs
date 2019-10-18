@@ -55,6 +55,21 @@ namespace JMG.HttpClientFactory
             throw new NotImplementedException();
         }
 
+        public void Setup<THttpClient>() where THttpClient : HttpClient
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Setup<THttpClient>(Func<HttpMessageHandler> handlerBuilder, IExpirationPolicy policy) where THttpClient : HttpClient
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Setup<THttpClient>(IExpirationPolicy policy) where THttpClient : HttpClient
+        {
+            throw new NotImplementedException();
+        }
+
         private Func<HttpMessageHandler, THttpClient> CreateHttpClientBuilder<THttpClient>() where THttpClient : HttpClient
         {
             var constructurWithHandler = typeof(THttpClient).GetConstructor(new[] { typeof(HttpMessageHandler) });
