@@ -74,17 +74,25 @@ namespace JMG.HttpClientFactory
         public THttpClient Build<THttpClient>() where THttpClient : HttpClient
         {
             var key = InstanceKey<THttpClient>();
-            var instanceManager = _instaceManagers[key];
-
-            return (THttpClient)instanceManager.Build();
+            return Build<THttpClient>(key);
         }
 
         public HttpClient Build(string namedInstance)
         {
             var key = InstanceKey(namedInstance);
-            var instanceManager = _instaceManagers[key];
+            return Build<HttpClient>(key);
+        }
 
-            return instanceManager.Build();
+        private THttpClient Build<THttpClient>(string instanceManagerKey) where THttpClient : HttpClient
+        {
+            var instanceManager = _instaceManagers[instanceManagerKey];
+
+            if (instanceManager == null)
+            {
+                throw new Exception($"Could not find builder for {instanceManagerKey}. Please use Setup() first.");
+            }
+
+            return (THttpClient)instanceManager.Build();
         }
 
         //build without prior setup using default settings
@@ -100,11 +108,6 @@ namespace JMG.HttpClientFactory
         private HttpMessageHandler DefaultHttpMessageHandlerBuilder()
         {
             return new HttpClientHandler();
-        }
-
-        private HttpClient DefaultHttpClientBuilder(HttpMessageHandler httpClientHandler)
-        {
-            return new HttpClient(httpClientHandler, false);
         }
 
         private Func<HttpMessageHandler, THttpClient> CreateHttpClientBuilder<THttpClient>() where THttpClient : HttpClient

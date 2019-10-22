@@ -16,9 +16,15 @@ namespace JMG.HttpClientFactoryTestsF
         [Test]
         public void CreatesDefaultClient()
         {
-            var sut = new HttpClientFactory.HttpClientFactory();
+            IHttpClientFactory sut = new HttpClientFactory.HttpClientFactory();
 
             var result = sut.Build();
+
+            sut.Setup("MyClient", 
+                (handler) => new HttpClient(handler), 
+                () => { var handler = new HttpClientHandler(); handler.Credentials = System.Net.CredentialCache.DefaultNetworkCredentials; return handler; },
+                new FixedExpirationPolicy(TimeSpan.FromSeconds(10))
+            );
 
             Assert.IsNotNull(result);
         }
