@@ -18,7 +18,7 @@ namespace JMG.HttpClientFactory
             ResetExpirationWindow();
         }
 
-        public bool HandlerExpired()
+        public bool ShouldRenew()
         {
             var hasExpired = _currentWindowExpiration < DateTime.UtcNow;
 

@@ -19,7 +19,7 @@ namespace JMG.HttpClientFactory
             _singleInstanceTime = instanceTime;
         }
 
-        public bool HandlerExpired()
+        public bool ShouldRenew()
         {
             var hasExpired = _currentWindowExpiration < DateTime.UtcNow;
 

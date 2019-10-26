@@ -19,7 +19,7 @@ namespace JMG.HttpClientFactory
             _maxCallsPerInstance = maxCallsPerInstance;
         }
 
-        public bool HandlerExpired()
+        public bool ShouldRenew()
         {
             _currentCount++;
             var hasExpired = _currentCount > _maxCallsPerInstance;

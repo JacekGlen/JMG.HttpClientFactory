@@ -95,6 +95,8 @@ namespace JMG.HttpClientFactory
             return (THttpClient)instanceManager.Build();
         }
 
+
+
         //build without prior setup using default settings
         //public THttpClient BuildDefault<THttpClient>() where THttpClient : HttpClient
         //{
@@ -112,16 +114,33 @@ namespace JMG.HttpClientFactory
 
         private Func<HttpMessageHandler, THttpClient> CreateHttpClientBuilder<THttpClient>() where THttpClient : HttpClient
         {
-            var constructurWithHandler = typeof(THttpClient).GetConstructor(new[] { typeof(HttpMessageHandler) });
+            var constructorWithHandler = typeof(THttpClient).GetConstructor(new[] { typeof(HttpMessageHandler) });
 
-            if (constructurWithHandler == null)
+            if (constructorWithHandler == null)
             {
                 throw new ArgumentException($"The type {typeof(THttpClient).FullName} does not have constructor that takes HttpMessageHandler as a parameter.");
             }
 
             Func<HttpMessageHandler, THttpClient> builder = (handler) =>
             {
-                return constructurWithHandler.Invoke(new[] { handler }) as THttpClient;
+                return constructorWithHandler.Invoke(new[] { handler }) as THttpClient;
+            };
+
+            return builder;
+        }
+
+        private Func<HttpMessageHandler> CreateHttpMessageBuilder<THttpMessageHandler>() where THttpMessageHandler : HttpMessageHandler
+        {
+            var constructor = typeof(THttpMessageHandler).GetConstructor(.GetConstructor();
+
+            if (constructor == null)
+            {
+                throw new ArgumentException($"The type {typeof(THttpClient).FullName} does not have constructor that takes HttpMessageHandler as a parameter.");
+            }
+
+            Func<HttpMessageHandler, THttpClient> builder = (handler) =>
+            {
+                return constructor.Invoke(new[] { handler }) as THttpClient;
             };
 
             return builder;

@@ -17,13 +17,13 @@ namespace JMG.HttpClientFactoryTestsF
         {
             var sut = new CountExpirationPolicy(5);
 
-            Assert.IsFalse(sut.HandlerExpired());
-            Assert.IsFalse(sut.HandlerExpired());
-            Assert.IsFalse(sut.HandlerExpired());
-            Assert.IsFalse(sut.HandlerExpired());
-            Assert.IsFalse(sut.HandlerExpired());
-            Assert.IsTrue(sut.HandlerExpired());
-            Assert.IsFalse(sut.HandlerExpired());
+            Assert.IsFalse(sut.ShouldRenew());
+            Assert.IsFalse(sut.ShouldRenew());
+            Assert.IsFalse(sut.ShouldRenew());
+            Assert.IsFalse(sut.ShouldRenew());
+            Assert.IsFalse(sut.ShouldRenew());
+            Assert.IsTrue(sut.ShouldRenew());
+            Assert.IsFalse(sut.ShouldRenew());
         }
     }
 }

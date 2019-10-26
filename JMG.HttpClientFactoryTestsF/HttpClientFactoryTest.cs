@@ -4,8 +4,10 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JMG.HttpClientFactoryTestsF
@@ -19,12 +21,6 @@ namespace JMG.HttpClientFactoryTestsF
             IHttpClientFactory sut = new HttpClientFactory.HttpClientFactory();
 
             var result = sut.Build();
-
-            sut.Setup("MyClient", 
-                (handler) => new HttpClient(handler), 
-                () => { var handler = new HttpClientHandler(); handler.Credentials = System.Net.CredentialCache.DefaultNetworkCredentials; return handler; },
-                new FixedExpirationPolicy(TimeSpan.FromSeconds(10))
-            );
 
             Assert.IsNotNull(result);
         }
@@ -103,7 +99,7 @@ namespace JMG.HttpClientFactoryTestsF
         }
 
         [Test]
-        public void CreatesTypedInstance()
+        public void CreatesTypedInstanceUsingClientBuilderAndHandlerBuilder()
         {
             var sut = new HttpClientFactory.HttpClientFactory();
             sut.Setup(
@@ -127,12 +123,12 @@ namespace JMG.HttpClientFactoryTestsF
         }
 
         [Test]
-        public void CreatesTypedInstanceWithHandlerCertificate()
+        public void CreatesTypedInstanceWithHandlerCertificateFunction()
         {
             var sut = new HttpClientFactory.HttpClientFactory();
             sut.Setup(
                 (handler) => new HttpClientTest(handler, GetBaseUri(), GetApiAuthToken()),
-                () => new HttpClientHandler(),
+                () => CreateHandlerWithCertificate(),
                 new DefaultHandlerPolicy()); ;
 
             var result = sut.Build<HttpClientTest>();
@@ -143,7 +139,19 @@ namespace JMG.HttpClientFactoryTestsF
         }
 
         [Test]
-        public void CreatesInstanceUsingConstructor()
+        public void CreatesTypedInstanceUsingDefaultConstructor()
+        {
+            var sut = new HttpClientFactory.HttpClientFactory();
+
+            sut.Setup<HttpClientTest>();
+
+            var result = sut.Build<HttpClientTest>();
+
+            Assert.IsNotNull(result);
+        }
+
+        [Test]
+        public void CreatesTypedInstanceUsingDefaultConstructorAndPolicy()
         {
             var sut = new HttpClientFactory.HttpClientFactory();
 
@@ -153,5 +161,52 @@ namespace JMG.HttpClientFactoryTestsF
 
             Assert.IsNotNull(result);
         }
+
+        [Test]
+        public void CreatesTypedInstanceUsingHandlerBuilderAndPolicy()
+        {
+            var sut = new HttpClientFactory.HttpClientFactory();
+
+            sut.Setup<HttpClientTest>(
+                CreateHandlerWithCertificate,
+                new CountExpirationPolicy(10)
+            );
+
+            var result = sut.Build<HttpClientTest>();
+
+            Assert.IsNotNull(result);
+        }
+
+        [Test]
+        public void CreatesTypedInstanceUsingClientBuilderAndPolicy()
+        {
+            var sut = new HttpClientFactory.HttpClientFactory();
+
+            sut.Setup(
+                (handler) => new HttpClientTest(handler),
+                new CountExpirationPolicy(10)
+            ); ;
+
+            var result = sut.Build<HttpClientTest>();
+
+            Assert.IsNotNull(result);
+        }
+
+        private class HttpMessageHandlerTest : HttpMessageHandler
+        {
+            readonly string message;
+
+            public HttpMessageHandlerTest()
+            {
+                message = DateTime.UtcNow.ToString();
+            }
+
+            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+            {
+                return Task.FromResult(new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StringContent(message) });
+            }
+        }
+
+
     }
 }

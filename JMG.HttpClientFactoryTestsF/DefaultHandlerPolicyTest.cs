@@ -19,7 +19,7 @@ namespace JMG.HttpClientFactoryTestsF
 
             for (int i = 0; i < 1000; ++i)
             {
-                Assert.IsFalse(sut.HandlerExpired());
+                Assert.IsFalse(sut.ShouldRenew());
             }
         }
     }

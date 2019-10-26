@@ -25,7 +25,7 @@ namespace JMG.HttpClientFactory
 
         public HttpClient Build()
         {
-            if (_hanndlerPolicy.HandlerExpired())
+            if (_hanndlerPolicy.ShouldRenew())
             {
                 _handler = _handlerBuilder();
             }

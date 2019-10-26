@@ -6,7 +6,7 @@ namespace JMG.HttpClientFactory
 {
     public class DefaultHandlerPolicy : IExpirationPolicy
     {
-        public bool HandlerExpired()
+        public bool ShouldRenew()
         {
             return false;
         }

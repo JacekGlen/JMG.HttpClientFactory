@@ -18,11 +18,11 @@ namespace JMG.HttpClientFactoryTestsF
         {
             var sut = new SlidingExpirationPolicy(TimeSpan.FromSeconds(2));
 
-            Assert.IsFalse(sut.HandlerExpired());
+            Assert.IsFalse(sut.ShouldRenew());
 
             Thread.Sleep(2100);
 
-            Assert.IsTrue(sut.HandlerExpired());
+            Assert.IsTrue(sut.ShouldRenew());
         }
 
         [Test]
@@ -30,16 +30,16 @@ namespace JMG.HttpClientFactoryTestsF
         {
             var sut = new SlidingExpirationPolicy(TimeSpan.FromSeconds(2));
 
-            Assert.IsFalse(sut.HandlerExpired());
+            Assert.IsFalse(sut.ShouldRenew());
 
             Thread.Sleep(1000);
-            Assert.IsFalse(sut.HandlerExpired());
+            Assert.IsFalse(sut.ShouldRenew());
 
             Thread.Sleep(1000);
-            Assert.IsFalse(sut.HandlerExpired());
+            Assert.IsFalse(sut.ShouldRenew());
 
             Thread.Sleep(1000);
-            Assert.IsFalse(sut.HandlerExpired());
+            Assert.IsFalse(sut.ShouldRenew());
         }
     }
 }
