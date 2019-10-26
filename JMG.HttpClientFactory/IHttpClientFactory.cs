@@ -10,6 +10,7 @@ namespace JMG.HttpClientFactory
         /// Ready-to-eat: No prior setup is required
         /// </summary>
         /// <returns>HttpClient instance</returns>
+        /// <example>
         HttpClient Build();
 
         /// <summary>
@@ -32,10 +33,10 @@ namespace JMG.HttpClientFactory
         /// <param name="namedInstance">A string that uniquely identifies this builder. Used to get the instance.</param>
         /// <param name="clientBuilder">A function that creates a new instance of <c>HttpClient</c>. This has to take <c>HttpMessageHandler</c> parameter</param>
         /// <param name="handlerBuilder">A function that creates a new instance of <c>HttpMessageHandler</c>. Used when expiration policy indicates the need to refresh the handler.</param>
-        /// <param name="policy">A policy that governs when a new instance of <c>HttpMessageHandler</c> is required.</param>
+        /// <param name="policy">A policy that governs when a new instance of <c>HttpMessageHandler</c> should be created.</param>
         /// <example>
         /// <code>
-        /// sut.Setup("MyClient", 
+        /// factory.Setup("MyClient", 
         ///        (handler) => new HttpClient(handler), 
         ///        () => { var handler = new HttpClientHandler(); handler.Credentials = System.Net.CredentialCache.DefaultNetworkCredentials; return handler; },
         ///        new FixedExpirationPolicy(TimeSpan.FromSeconds(10))
@@ -45,28 +46,74 @@ namespace JMG.HttpClientFactory
         void Setup(string namedInstance, Func<HttpMessageHandler, HttpClient> clientBuilder, Func<HttpMessageHandler> handlerBuilder, IExpirationPolicy policy);
 
         /// <summary>
-        /// Sets up a builder than can be then used to create a new instance of <c><HttpClient/c>. This uses default 
+        /// Sets up a builder than can be then used to create a new instance of <c><HttpClient/c>. This uses default HttpMessageHandler.
         /// </summary>
         /// <param name="namedInstance">A string that uniquely identifies this builder. Used to get the instance.</param>
         /// <param name="clientBuilder">A function that creates a new instance of <c>HttpClient</c>. This has to take <c>HttpMessageHandler</c> parameter</param>
-        /// <param name="policy"></param>
+        /// <param name="policy">A policy that governs when a new instance of <c>HttpMessageHandler</c> should be created.</param>
+        /// <example>
+        /// <code>
+        /// factory.Setup("MyClient", 
+        ///        (handler) => new HttpClient(handler), 
+        ///        new FixedExpirationPolicy(TimeSpan.FromSeconds(10))
+        /// );
+        /// </code>
+        /// </example>
         void Setup(string namedInstance, Func<HttpMessageHandler, HttpClient> clientBuilder, IExpirationPolicy policy);
 
         /// <summary>
-        /// 
+        /// Sets up a named instance using the default HttpClient and default HttpMessageHandler
         /// </summary>
-        /// <param name="namedInstance"></param>
-        /// <param name="policy"></param>
+        /// <param name="namedInstance">A string that uniquely identifies this builder. Used to get the instance.</param>
+        /// <param name="policy">A policy that governs when a new instance of <c>HttpMessageHandler</c> should be created.</param>
         void Setup(string namedInstance, IExpirationPolicy policy);
+
+        /// <summary>
+        /// Sets up a strongly typed HttpClient. Useful when creating a type per API.
+        /// </summary>
+        /// <typeparam name="THttpClient">A class deriving from HttpClient. The class has to have a contstutor which takes a single HttpMessageHandler parameter</typeparam>
+        void Setup<THttpClient>() where THttpClient : HttpClient;
+
+        /// <summary>
+        /// Sets up a strongly typed HttpClient with its own builders. The most natural use of the factory and this allows to specify all aspects of creating the client.
+        /// The handler builder should include all application specific settings like security, certificates, etc.
+        /// </summary>
+        /// <typeparam name="THttpClient">A class deriving from HttpClient.</typeparam>
+        /// <param name="clientBuilder">A function that creates a new instance of <c>HttpClient</c>. This has to take <c>HttpMessageHandler</c> parameter</param>
+        /// <param name="handlerBuilder">A function that creates a new instance of <c>HttpMessageHandler</c>. Used when expiration policy indicates the need to refresh the handler.</param>
+        /// <param name="policy">A policy that governs when a new instance of <c>HttpMessageHandler</c> should be created.</param>
+        /// <example>
+        /// <code>
+        /// factory.Setup( 
+        ///        (handler) => new UserApiHttpClient(handler),
+        ///        () => { var handler = new HttpClientHandler(); handler.Credentials = System.Net.CredentialCache.DefaultNetworkCredentials; return handler; },
+        ///        new FixedExpirationPolicy(TimeSpan.FromSeconds(10))
+        /// );
+        /// </code>
+        /// </example>
+        void Setup<THttpClient>(Func<HttpMessageHandler, THttpClient> clientBuilder, Func<HttpMessageHandler> handlerBuilder, IExpirationPolicy policy) where THttpClient : HttpClient;
+
+        /// <summary>
+        /// Sets up a strongly typed HttpClient with its own builder and default HttpMessageHandler
+        /// </summary>
+        /// <typeparam name="THttpClient">A class deriving from HttpClient.</typeparam>
+        /// <param name="clientBuilder">A function that creates a new instance of <c>HttpClient</c>. This has to take <c>HttpMessageHandler</c> parameter</param>
+        /// <param name="policy">A policy that governs when a new instance of <c>HttpMessageHandler</c> should be created.</param>
+        void Setup<THttpClient>(Func<HttpMessageHandler, THttpClient> clientBuilder, IExpirationPolicy policy) where THttpClient : HttpClient;
 
         /// <summary>
         /// 
         /// </summary>
-        /// <typeparam name="THttpClient"></typeparam>
-        void Setup<THttpClient>() where THttpClient : HttpClient;
-        void Setup<THttpClient>(Func<HttpMessageHandler, THttpClient> clientBuilder, Func<HttpMessageHandler> handlerBuilder, IExpirationPolicy policy) where THttpClient : HttpClient;
-        void Setup<THttpClient>(Func<HttpMessageHandler, THttpClient> clientBuilder, IExpirationPolicy policy) where THttpClient : HttpClient;
+        /// <typeparam name="THttpClient">A class deriving from HttpClient. The class has to have a contstutor which takes a single HttpMessageHandler parameter</typeparam>
+        /// <param name="handlerBuilder">A function that creates a new instance of <c>HttpMessageHandler</c>. Used when expiration policy indicates the need to refresh the handler.</param>
+        /// <param name="policy">A policy that governs when a new instance of <c>HttpMessageHandler</c> should be created.</param>
         void Setup<THttpClient>(Func<HttpMessageHandler> handlerBuilder, IExpirationPolicy policy) where THttpClient : HttpClient;
+
+        /// <summary>
+        /// Sets up a strongly typed HttpClient. Useful when creating a type per API.
+        /// </summary>
+        /// <typeparam name="THttpClient">A class deriving from HttpClient. The class has to have a contstutor which takes a single HttpMessageHandler parameter</typeparam>
+        /// <param name="policy">A policy that governs when a new instance of <c>HttpMessageHandler</c> should be created.</param>
         void Setup<THttpClient>(IExpirationPolicy policy) where THttpClient : HttpClient;
     }
 }
