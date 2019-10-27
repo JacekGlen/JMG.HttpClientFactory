@@ -70,23 +70,6 @@ namespace JMG.HttpClientFactoryTestsF
             Assert.IsNotNull(result);
         }
 
-        public class HttpClientTest : HttpClient
-        {
-            public HttpClientTest(HttpMessageHandler handler, string baseUri, string apiAuthToken) : base(handler)
-            {
-                this.BaseAddress = new Uri(baseUri);
-                this.DefaultRequestHeaders.Add("Bearer", apiAuthToken);
-            }
-
-            public HttpClientTest(HttpMessageHandler handler, string baseUri) : base(handler)
-            {
-                this.BaseAddress = new Uri(baseUri);
-            }
-
-            public HttpClientTest(HttpMessageHandler handler) : base(handler)
-            {
-            }
-        }
 
         private string GetBaseUri()
         {
@@ -96,6 +79,13 @@ namespace JMG.HttpClientFactoryTestsF
         private string GetApiAuthToken()
         {
             return Guid.NewGuid().ToString();
+        }
+        private HttpClientHandler CreateHandlerWithCertificate()
+        {
+            var handler = new HttpClientHandler();
+            handler.ClientCertificates.Add(new System.Security.Cryptography.X509Certificates.X509Certificate());
+
+            return handler;
         }
 
         [Test]
@@ -112,14 +102,6 @@ namespace JMG.HttpClientFactoryTestsF
             Assert.IsNotNull(result);
             Assert.AreEqual("http://example.com/api", result.BaseAddress.AbsoluteUri);
             Assert.IsTrue(result.DefaultRequestHeaders.Any(h => h.Key == "Bearer"));
-        }
-
-        private HttpClientHandler CreateHandlerWithCertificate()
-        {
-            var handler = new HttpClientHandler();
-            handler.ClientCertificates.Add(new System.Security.Cryptography.X509Certificates.X509Certificate());
-
-            return handler;
         }
 
         [Test]
@@ -192,21 +174,59 @@ namespace JMG.HttpClientFactoryTestsF
             Assert.IsNotNull(result);
         }
 
-        private class HttpMessageHandlerTest : HttpMessageHandler
+        [Test]
+        public void CreatesTypedInstanceOfClientAndHandler()
         {
-            readonly string message;
+            var sut = new HttpClientFactory.HttpClientFactory();
 
-            public HttpMessageHandlerTest()
-            {
-                message = DateTime.UtcNow.ToString();
-            }
+            sut.Setup<HttpClientTest, HttpMessageHandlerTest>();
 
-            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-            {
-                return Task.FromResult(new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StringContent(message) });
-            }
+            var result = sut.Build<HttpClientTest>();
+
+            Assert.IsNotNull(result);
         }
 
+        [Test]
+        public void CreatesTypedInstanceWithoutPriorSetup()
+        {
+            var sut = new HttpClientFactory.HttpClientFactory();
 
+            var result = sut.BuildAdHoc<HttpClientTest>();
+
+            Assert.IsNotNull(result);
+        }
     }
+
+    public class HttpClientTest : HttpClient
+    {
+        public HttpClientTest(HttpMessageHandler handler, string baseUri, string apiAuthToken) : base(handler)
+        {
+            this.BaseAddress = new Uri(baseUri);
+            this.DefaultRequestHeaders.Add("Bearer", apiAuthToken);
+        }
+
+        public HttpClientTest(HttpMessageHandler handler, string baseUri) : base(handler)
+        {
+            this.BaseAddress = new Uri(baseUri);
+        }
+
+        public HttpClientTest(HttpMessageHandler handler) : base(handler)
+        {
+        }
+    }
+    public class HttpMessageHandlerTest : HttpMessageHandler
+    {
+        readonly string message;
+
+        public HttpMessageHandlerTest()
+        {
+            message = DateTime.UtcNow.ToString();
+        }
+
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StringContent(message) });
+        }
+    }
+
 }

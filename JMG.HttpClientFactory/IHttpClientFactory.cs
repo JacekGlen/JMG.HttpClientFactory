@@ -6,7 +6,7 @@ namespace JMG.HttpClientFactory
     public interface IHttpClientFactory
     {
         /// <summary>
-        /// Creates a new instance of HttpClient using default builders for client and handler, and default expiration policy.
+        /// Creates a new instance of HttpClient using default builders for the client and the handler, and default expiration policy.
         /// Ready-to-eat: No prior setup is required
         /// </summary>
         /// <returns>HttpClient instance</returns>
@@ -23,9 +23,17 @@ namespace JMG.HttpClientFactory
         /// <summary>
         /// Creates a new instance of <c>THttpClient</c> using previously set up builders. If no builder was specified then default is used.
         /// </summary>
-        /// <typeparam name="THttpClient"></typeparam>
+        /// <typeparam name="THttpClient">A class deriving from HttpClient. The class has to have a contstutor which takes a single HttpMessageHandler parameter</typeparam>
         /// <returns><c>THttpClient</c> instance</returns>
         THttpClient Build<THttpClient>() where THttpClient : HttpClient;
+
+        /// <summary>
+        /// Creates a new instance of <c>THttpClient</c> without prior setup.
+        /// Warning: This method will not actively manage HttpMessageHandler and therefore creates a new instance for each call. Not recommended.
+        /// </summary>
+        /// <typeparam name="THttpClient">A class deriving from HttpClient. The class has to have a contstutor which takes a single HttpMessageHandler parameter</typeparam>
+        /// <returns><c>THttpClient</c> instance</returns>
+        THttpClient BuildAdHoc<THttpClient>() where THttpClient : HttpClient;
 
         /// <summary>
         /// Sets up a builder than can be then used to create a new instance of <c><HttpClient/c>
@@ -102,7 +110,7 @@ namespace JMG.HttpClientFactory
         void Setup<THttpClient>(Func<HttpMessageHandler, THttpClient> clientBuilder, IExpirationPolicy policy) where THttpClient : HttpClient;
 
         /// <summary>
-        /// 
+        /// Sets up a strongly typed HttpClient with its own builder. Useful when creating a client type per API.
         /// </summary>
         /// <typeparam name="THttpClient">A class deriving from HttpClient. The class has to have a contstutor which takes a single HttpMessageHandler parameter</typeparam>
         /// <param name="handlerBuilder">A function that creates a new instance of <c>HttpMessageHandler</c>. Used when expiration policy indicates the need to refresh the handler.</param>
@@ -110,10 +118,17 @@ namespace JMG.HttpClientFactory
         void Setup<THttpClient>(Func<HttpMessageHandler> handlerBuilder, IExpirationPolicy policy) where THttpClient : HttpClient;
 
         /// <summary>
-        /// Sets up a strongly typed HttpClient. Useful when creating a type per API.
+        /// Sets up a strongly typed HttpClient. Useful when creating a client type per API.
         /// </summary>
         /// <typeparam name="THttpClient">A class deriving from HttpClient. The class has to have a contstutor which takes a single HttpMessageHandler parameter</typeparam>
         /// <param name="policy">A policy that governs when a new instance of <c>HttpMessageHandler</c> should be created.</param>
         void Setup<THttpClient>(IExpirationPolicy policy) where THttpClient : HttpClient;
+
+        /// <summary>
+        /// Sets up strongly typed HttpClient and HttpMessageHandler.
+        /// </summary>
+        /// <typeparam name="THttpClient">A class deriving from HttpClient. The class has to have a contstutor which takes a single HttpMessageHandler parameter</typeparam>
+        /// <typeparam name="THttpMessageHandler">A class deriving from HttpMessageHandler. The class has to have parameterless constructor.</typeparam>
+        void Setup<THttpClient, THttpMessageHandler>() where THttpClient : HttpClient where THttpMessageHandler : HttpMessageHandler;
     }
 }

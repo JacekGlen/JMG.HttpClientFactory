@@ -30,6 +30,11 @@ namespace JMG.HttpClientFactory
             return CreateHttpClientBuilder<THttpClient>()(_handler);
         }
 
+        public THttpClient BuildAdHoc<THttpClient>() where THttpClient : HttpClient
+        {
+            return CreateHttpClientBuilder<THttpClient>()(_handler);
+        }
+
         public void Setup(string namedInstance, Func<HttpMessageHandler, HttpClient> clientBuilder, Func<HttpMessageHandler> handlerBuilder, IExpirationPolicy policy)
         {
             throw new NotImplementedException();
@@ -66,6 +71,11 @@ namespace JMG.HttpClientFactory
         }
 
         public void Setup<THttpClient>(IExpirationPolicy policy) where THttpClient : HttpClient
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Setup<THttpClient, THttpMessageHandler>() where THttpClient : HttpClient where THttpMessageHandler : HttpMessageHandler
         {
             throw new NotImplementedException();
         }

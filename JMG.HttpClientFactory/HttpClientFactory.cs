@@ -8,10 +8,15 @@ namespace JMG.HttpClientFactory
 
     public class HttpClientFactory : IHttpClientFactory
     {
-        private static readonly Dictionary<string, InstanceManager> _instaceManagers = new Dictionary<string, InstanceManager>
+        private readonly Dictionary<string, InstanceManager> _instaceManagers;
+
+        public HttpClientFactory()
         {
-             {  String.Empty, InstanceManager.Default }
-        };
+            _instaceManagers = new Dictionary<string, InstanceManager>
+                {
+                       {  String.Empty, InstanceManager.Default }
+                };
+        }
 
         public void Setup<THttpClient>() where THttpClient : HttpClient
         {
@@ -55,6 +60,14 @@ namespace JMG.HttpClientFactory
         }
 
 
+        public void Setup<THttpClient, THttpMessageHandler>() where THttpClient : HttpClient where THttpMessageHandler : HttpMessageHandler
+        {
+            _instaceManagers[InstanceKey<THttpClient>()] = new InstanceManager(
+                CreateHttpClientBuilder<THttpClient>(),
+                CreateHttpMessageBuilder<THttpMessageHandler>(),
+                new DefaultHandlerPolicy());
+        }
+
 
         private string InstanceKey<THttpClient>() where THttpClient : HttpClient
         {
@@ -95,16 +108,14 @@ namespace JMG.HttpClientFactory
             return (THttpClient)instanceManager.Build();
         }
 
+        public THttpClient BuildAdHoc<THttpClient>() where THttpClient : HttpClient
+        {
+            var client = CreateHttpClientBuilder<THttpClient>()(
+                            CreateHttpMessageBuilder<HttpClientHandler>()()
+                        );
 
-
-        //build without prior setup using default settings
-        //public THttpClient BuildDefault<THttpClient>() where THttpClient : HttpClient
-        //{
-        //    var key = InstanceKey<THttpClient>();
-        //    var instanceManager = _instaceManagers[key];
-
-        //    return (THttpClient)instanceManager.Build();
-        //}
+            return client;
+        }
 
 
         private HttpMessageHandler DefaultHttpMessageHandlerBuilder()
@@ -131,19 +142,27 @@ namespace JMG.HttpClientFactory
 
         private Func<HttpMessageHandler> CreateHttpMessageBuilder<THttpMessageHandler>() where THttpMessageHandler : HttpMessageHandler
         {
-            var constructor = typeof(THttpMessageHandler).GetConstructor(.GetConstructor();
+            var constructor = typeof(THttpMessageHandler).GetConstructor(Array.Empty<Type>());
 
             if (constructor == null)
             {
-                throw new ArgumentException($"The type {typeof(THttpClient).FullName} does not have constructor that takes HttpMessageHandler as a parameter.");
+                throw new ArgumentException($"The type does not have parameterless constructor.");
             }
 
-            Func<HttpMessageHandler, THttpClient> builder = (handler) =>
+            Func<HttpMessageHandler> builder = () =>
             {
-                return constructor.Invoke(new[] { handler }) as THttpClient;
+                return constructor.Invoke(Array.Empty<object>()) as THttpMessageHandler;
             };
 
             return builder;
+        }
+
+        public static HttpClientFactory Default
+        {
+            get
+            {
+                return new HttpClientFactory();
+            }
         }
     }
 }
