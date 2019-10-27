@@ -195,6 +195,137 @@ namespace JMG.HttpClientFactoryTestsF
 
             Assert.IsNotNull(result);
         }
+
+        [Test]
+        public void CreatesFromDefaultInstanceFactory()
+        {
+            var sut = HttpClientFactory.HttpClientFactory.Default;
+
+            var result = sut.Build();
+
+            Assert.IsNotNull(result);
+        }
+
+        [Test]
+        public void CannotCreateUsingTypeNotSetPrior()
+        {
+            var sut = new HttpClientFactory.HttpClientFactory();
+
+            Assert.Throws<Exception>(() => { sut.Build<HttpClientTest>(); });
+        }
+
+        [Test]
+        public void CannotCreateUsingNamedInstanceNotSetPrior()
+        {
+            var sut = new HttpClientFactory.HttpClientFactory();
+
+            Assert.Throws<Exception>(() => { sut.Build("MyInstance"); });
+        }
+
+        [Test]
+        public void DefaultInstanceFactoryAndNewedUpFactoryDoNotShareConfig()
+        {
+            var sut = new HttpClientFactory.HttpClientFactory();
+
+            sut.Setup<HttpClientTest>(new SlidingExpirationPolicy(TimeSpan.FromSeconds(2)));
+
+            var client = sut.Build<HttpClientTest>();
+
+            Assert.IsNotNull(client);
+
+
+            var sutDefault = HttpClientFactory.HttpClientFactory.Default;
+
+            Assert.Throws<Exception>(() => { sutDefault.Build<HttpClientTest>(); });
+        }
+
+        [Test]
+        public async Task ReusesTheSameInstanceOfHandlerForDefaultPolicy()
+        {
+            var sut = new HttpClientFactory.HttpClientFactory();
+
+            sut.Setup(
+                    (handler) => new HttpClientTest(handler),
+                    () => new HttpMessageHandlerTest(),
+                    new DefaultHandlerPolicy()
+                ); ;
+
+            var client1 = sut.Build<HttpClientTest>();
+            var response1 = await client1.GetAsync("http://example.com/api/users");
+            var result1 = await response1.Content.ReadAsStringAsync();
+
+            await Task.Delay(100);
+
+            var client2 = sut.Build<HttpClientTest>();
+            var response2 = await client1.GetAsync("http://example.com/api/users");
+            var result2 = await response1.Content.ReadAsStringAsync();
+
+            Assert.AreEqual(result1, result2);
+        }
+
+        [Test]
+        public async Task CreatesNewInstanceOfHandlerWhenPolicyDictates()
+        {
+            var sut = new HttpClientFactory.HttpClientFactory();
+
+            sut.Setup(
+                    (handler) => new HttpClientTest(handler),
+                    () => new HttpMessageHandlerTest(),
+                    new CountExpirationPolicy(1)
+                );
+
+            var client1 = sut.Build<HttpClientTest>();
+            var response1 = await client1.GetAsync("http://example.com/api/users");
+            var result1 = await response1.Content.ReadAsStringAsync();
+
+            await Task.Delay(100);
+
+            var client2 = sut.Build<HttpClientTest>();
+            var response2 = await client2.GetAsync("http://example.com/api/users");
+            var result2 = await response2.Content.ReadAsStringAsync();
+
+            Assert.AreNotEqual(result1, result2);
+        }
+
+        [Test]
+        public async Task DisposingClientDoesNotDisposeHandler()
+        {
+            var sut = new HttpClientFactory.HttpClientFactory();
+
+            sut.Setup(
+                    (handler) => new HttpClientTest(handler),
+                    () => new HttpMessageHandlerTest(),
+                    new DefaultHandlerPolicy()
+                );
+
+            string result;
+
+            using(var client1 = sut.Build<HttpClientTest>())
+            {
+                var response1 = await client1.GetAsync("http://example.com/api/users");
+                result = await response1.Content.ReadAsStringAsync();
+            }
+
+            Assert.IsNotNull(result);
+
+
+            using (var client2 = sut.Build<HttpClientTest>())
+            {
+                var response2 = await client2.GetAsync("http://example.com/api/users");
+                result = await response2.Content.ReadAsStringAsync();
+            }
+
+            Assert.IsNotNull(result);
+
+            using (var client3 = sut.Build<HttpClientTest>())
+            {
+                var response3 = await client3.GetAsync("http://example.com/api/users");
+                result = await response3.Content.ReadAsStringAsync();
+            }
+
+            Assert.IsNotNull(result);
+        }
+
     }
 
     public class HttpClientTest : HttpClient
@@ -220,7 +351,7 @@ namespace JMG.HttpClientFactoryTestsF
 
         public HttpMessageHandlerTest()
         {
-            message = DateTime.UtcNow.ToString();
+            message = DateTime.UtcNow.Ticks.ToString();
         }
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)

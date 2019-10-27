@@ -98,12 +98,12 @@ namespace JMG.HttpClientFactory
 
         private THttpClient Build<THttpClient>(string instanceManagerKey) where THttpClient : HttpClient
         {
-            var instanceManager = _instaceManagers[instanceManagerKey];
-
-            if (instanceManager == null)
+            if (!_instaceManagers.ContainsKey(instanceManagerKey))
             {
                 throw new Exception($"Could not find builder for {instanceManagerKey}. Please use Setup() first.");
             }
+
+            var instanceManager = _instaceManagers[instanceManagerKey];
 
             return (THttpClient)instanceManager.Build();
         }
