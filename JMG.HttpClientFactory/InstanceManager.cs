@@ -78,7 +78,7 @@ namespace JMG.HttpClientFactory
         {
             var privateFieldFlags = BindingFlags.Instance | BindingFlags.NonPublic;
 
-            //.NET Framework and .NET Core use different namig convention for private fields
+            //.NET Framework and .NET Core use different naming convention for private fields
             var httpMessageInvokerType = typeof(HttpMessageInvoker);
             _disposeHandlerField =
                 httpMessageInvokerType.GetField("disposeHandler", privateFieldFlags) ??
@@ -86,9 +86,10 @@ namespace JMG.HttpClientFactory
 
 
             var httpMessageHandlerType = handler.GetType();
-            _disposedField =
-                httpMessageHandlerType.GetField("disposed", privateFieldFlags) ??
-                httpMessageHandlerType.GetField("_disposed", privateFieldFlags);
+            while (
+                    (_disposedField = httpMessageHandlerType.GetField("disposed", privateFieldFlags)) == null &&
+                    (_disposedField = httpMessageHandlerType.GetField("_disposed", privateFieldFlags)) == null &&
+                    (httpMessageHandlerType = httpMessageHandlerType.BaseType) is Type) ;
         }
     }
 }
