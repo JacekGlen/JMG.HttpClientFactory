@@ -157,12 +157,7 @@ namespace JMG.HttpClientFactory
             return builder;
         }
 
-        public static HttpClientFactory Default
-        {
-            get
-            {
-                return new HttpClientFactory();
-            }
-        }
+        private static HttpClientFactory _defaultInstance = new HttpClientFactory();
+        public static HttpClientFactory Default => _defaultInstance;
     }
 }
