@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Net.Http;
 using System.Diagnostics;
+using JMG.HttpClientFactory;
 
 namespace PortExhaustionPresentationFramework
 {
@@ -35,15 +36,19 @@ namespace PortExhaustionPresentationFramework
 
             //warm up
             await exec.RunMeasured(exec.Request, 10);
+            var requestCount = 1000;
 
-            elapsed = await exec.RunMeasured(exec.Request, 100);
+            elapsed = await exec.RunMeasured(exec.Request, requestCount);
             Console.WriteLine($"Simple request time: {elapsed}ms");
 
-            elapsed = await exec.RunMeasured(exec.RequestAndDispose, 100);
+            elapsed = await exec.RunMeasured(exec.RequestAndDispose, requestCount);
             Console.WriteLine($"Request and dispose time: {elapsed}ms");
 
-            elapsed = await exec.RunMeasured(exec.RequestWithStatic, 100);
+            elapsed = await exec.RunMeasured(exec.RequestWithStatic, requestCount);
             Console.WriteLine($"Request using singleton time: {elapsed}ms");
+
+            elapsed = await exec.RunMeasured(exec.RequestWithFactory, requestCount);
+            Console.WriteLine($"Request using factory time: {elapsed}ms");
         }
     }
 
@@ -116,6 +121,7 @@ namespace PortExhaustionPresentationFramework
         public async Task<long> RunMeasured(Func<Task> method, int iterationsCount = 10)
         {
             sw.Restart();
+            Exception exception = null;
 
             for (int i = 1; i <= iterationsCount; ++i)
             {
@@ -125,10 +131,17 @@ namespace PortExhaustionPresentationFramework
                 }
                 catch (Exception ex)
                 {
+                    exception = ex;
                 }
             }
-
             sw.Stop();
+
+            if (exception != null)
+            {
+                throw exception;
+            }
+
+            await Task.Delay(100);
             return sw.ElapsedMilliseconds;
         }
 
@@ -153,11 +166,21 @@ namespace PortExhaustionPresentationFramework
         #endregion
 
         #region Request optimized
-        private static HttpClient client = new HttpClient();
+        private HttpClient client = new HttpClient();
         public async Task RequestWithStatic()
         {
             var result = await client.GetAsync(url);
         }
         #endregion
+
+        #region Request optimized
+        private HttpClientFactory factory = HttpClientFactory.Default;
+        public async Task RequestWithFactory()
+        {
+            var hc = factory.Build();
+            var result = await hc.GetAsync(url);
+        }
+        #endregion
+
     }
 }

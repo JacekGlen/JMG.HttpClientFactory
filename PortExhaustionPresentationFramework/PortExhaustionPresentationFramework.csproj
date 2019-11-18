@@ -49,5 +49,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\JMG.HttpClientFactory\JMG.HttpClientFactory.csproj">
+      <Project>{00e7adbb-43a7-482f-b1bf-4ad720cc621d}</Project>
+      <Name>JMG.HttpClientFactory</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
