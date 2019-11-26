@@ -9,8 +9,8 @@
     <ProjectGuid>{DA4B52DA-2C24-4170-86F8-446F3F942A50}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>JMG.HttpClientFactoryTestsF</RootNamespace>
-    <AssemblyName>JMG.HttpClientFactoryTestsF</AssemblyName>
+    <RootNamespace>JMG.HttpClientFactory.Tests</RootNamespace>
+    <AssemblyName>JMG.HttpClientFactory.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>

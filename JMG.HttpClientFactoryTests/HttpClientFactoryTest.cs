@@ -384,6 +384,7 @@ namespace JMG.HttpClientFactoryTestsF
         {
         }
     }
+
     public class HttpMessageHandlerTest : HttpMessageHandler
     {
         readonly string message;

@@ -173,7 +173,7 @@ namespace PortExhaustionPresentationFramework
         }
         #endregion
 
-        #region Request optimized
+        #region Request factory
         private HttpClientFactory factory = HttpClientFactory.Default;
         public async Task RequestWithFactory()
         {
