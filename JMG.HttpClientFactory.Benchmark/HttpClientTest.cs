@@ -8,16 +8,17 @@ using System.Threading.Tasks;
 
 namespace JMG.HttpClientFactory.Benchmark
 {
-//    [SimpleJob(RuntimeMoniker.Net461)]
-//    [SimpleJob(RuntimeMoniker.Net472, baseline: true)]
-  //  [SimpleJob(RuntimeMoniker.Net48)]
+    [SimpleJob(RuntimeMoniker.Net461, launchCount: 1, warmupCount: 1, targetCount: 1, invocationCount: 1000)]
+    [SimpleJob(RuntimeMoniker.Net472, launchCount: 1, warmupCount: 1, targetCount: 1, invocationCount: 1000)]
+    [SimpleJob(RuntimeMoniker.Net48, launchCount: 1, warmupCount: 1, targetCount: 1, invocationCount: 1000)]
+    
+    [SimpleJob(RuntimeMoniker.NetCoreApp20, launchCount: 1, warmupCount: 1, targetCount: 1, invocationCount: 1000)]
+    [SimpleJob(RuntimeMoniker.NetCoreApp21, launchCount: 1, warmupCount: 1, targetCount: 1, invocationCount: 1000)]
+    [SimpleJob(RuntimeMoniker.NetCoreApp30, launchCount: 1, warmupCount: 1, targetCount: 1, invocationCount: 1000)]
 
-    //[SimpleJob(RuntimeMoniker.NetCoreApp20)]
-    //[SimpleJob(RuntimeMoniker.NetCoreApp21)]
-    [SimpleJob(RuntimeMoniker.NetCoreApp30, launchCount: 20, warmupCount: 1, invocationCount: 10 )]
-    //[SimpleJob(RuntimeMoniker.Mono)]
-    //[ShortRunJob()]
-    //[RPlotExporter]
+    //[SimpleJob(RuntimeMoniker.Mono, launchCount: 1, warmupCount: 1, targetCount: 1, invocationCount: 1000)]
+
+    [RPlotExporter]
     public class HttpClientTest
     {
         private string url = "http://localhost:3070";
