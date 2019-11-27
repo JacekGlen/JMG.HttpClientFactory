@@ -7,7 +7,7 @@ using NUnit.Framework;
 using Moq;
 using JMG.HttpClientFactory;
 
-namespace JMG.HttpClientFactoryTestsF
+namespace JMG.HttpClientFactory.Tests
 {
     [TestFixture]
     public class DefaultHandlerPolicyTest

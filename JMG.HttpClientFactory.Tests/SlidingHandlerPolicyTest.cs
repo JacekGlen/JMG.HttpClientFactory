@@ -8,7 +8,7 @@ using Moq;
 using JMG.HttpClientFactory;
 using System.Threading;
 
-namespace JMG.HttpClientFactoryTestsF
+namespace JMG.HttpClientFactory.Tests
 {
     [TestFixture]
     public class SlidingHandlerPolicyTest

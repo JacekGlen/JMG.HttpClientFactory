@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace JMG.HttpClientFactoryTestsF
+namespace JMG.HttpClientFactory.Tests
 {
     [TestFixture]
     public class HttpClientFactoryTest
@@ -18,7 +18,7 @@ namespace JMG.HttpClientFactoryTestsF
         [Test]
         public void CreatesDefaultClient()
         {
-            IHttpClientFactory sut = new HttpClientFactory.HttpClientFactory();
+            IHttpClientFactory sut = new HttpClientFactory();
 
             var result = sut.Build();
 
@@ -28,7 +28,7 @@ namespace JMG.HttpClientFactoryTestsF
         [Test]
         public void CreatesDefaultNamedClient()
         {
-            var sut = new HttpClientFactory.HttpClientFactory();
+            var sut = new HttpClientFactory();
             sut.Setup("myclient", new DefaultHandlerPolicy());
 
             var result = sut.Build("myclient");
@@ -39,7 +39,7 @@ namespace JMG.HttpClientFactoryTestsF
         [Test]
         public void DefaultNamedClientIsDifferentToDefaultClient()
         {
-            var sut = new HttpClientFactory.HttpClientFactory();
+            var sut = new HttpClientFactory();
             sut.Setup("myclient", new DefaultHandlerPolicy());
 
             var result1 = sut.Build("myclient");
@@ -51,7 +51,7 @@ namespace JMG.HttpClientFactoryTestsF
         [Test]
         public void CreatesNamedInstanceFromBuilder()
         {
-            var sut = new HttpClientFactory.HttpClientFactory();
+            var sut = new HttpClientFactory();
             sut.Setup("myclient", (handler) => new HttpClient(handler), new DefaultHandlerPolicy()); ;
 
             var result = sut.Build("myclient");
@@ -62,7 +62,7 @@ namespace JMG.HttpClientFactoryTestsF
         [Test]
         public void CreatesNamedInstanceFromBuilderAndHandlerBuilder()
         {
-            var sut = new HttpClientFactory.HttpClientFactory();
+            var sut = new HttpClientFactory();
             sut.Setup("myclient", (handler) => new HttpClient(handler), () => new HttpClientHandler(), new DefaultHandlerPolicy()); ;
 
             var result = sut.Build("myclient");
@@ -91,7 +91,7 @@ namespace JMG.HttpClientFactoryTestsF
         [Test]
         public void CreatesTypedInstanceUsingClientBuilderAndHandlerBuilder()
         {
-            var sut = new HttpClientFactory.HttpClientFactory();
+            var sut = new HttpClientFactory();
             sut.Setup(
                 (handler) => new HttpClientTest(handler, GetBaseUri(), GetApiAuthToken()),
                 () => new HttpClientHandler(),
@@ -107,7 +107,7 @@ namespace JMG.HttpClientFactoryTestsF
         [Test]
         public void CreatesTypedInstanceWithHandlerCertificateFunction()
         {
-            var sut = new HttpClientFactory.HttpClientFactory();
+            var sut = new HttpClientFactory();
             sut.Setup(
                 (handler) => new HttpClientTest(handler, GetBaseUri(), GetApiAuthToken()),
                 () => CreateHandlerWithCertificate(),
@@ -123,7 +123,7 @@ namespace JMG.HttpClientFactoryTestsF
         [Test]
         public void CreatesTypedInstanceUsingDefaultConstructor()
         {
-            var sut = new HttpClientFactory.HttpClientFactory();
+            var sut = new HttpClientFactory();
 
             sut.Setup<HttpClientTest>();
 
@@ -135,7 +135,7 @@ namespace JMG.HttpClientFactoryTestsF
         [Test]
         public void CreatesTypedInstanceUsingDefaultConstructorAndPolicy()
         {
-            var sut = new HttpClientFactory.HttpClientFactory();
+            var sut = new HttpClientFactory();
 
             sut.Setup<HttpClientTest>(new DefaultHandlerPolicy());
 
@@ -147,7 +147,7 @@ namespace JMG.HttpClientFactoryTestsF
         [Test]
         public void CreatesTypedInstanceUsingHandlerBuilderAndPolicy()
         {
-            var sut = new HttpClientFactory.HttpClientFactory();
+            var sut = new HttpClientFactory();
 
             sut.Setup<HttpClientTest>(
                 CreateHandlerWithCertificate,
@@ -162,7 +162,7 @@ namespace JMG.HttpClientFactoryTestsF
         [Test]
         public void CreatesTypedInstanceUsingClientBuilderAndPolicy()
         {
-            var sut = new HttpClientFactory.HttpClientFactory();
+            var sut = new HttpClientFactory();
 
             sut.Setup(
                 (handler) => new HttpClientTest(handler),
@@ -177,7 +177,7 @@ namespace JMG.HttpClientFactoryTestsF
         [Test]
         public void CreatesTypedInstanceOfClientAndHandler()
         {
-            var sut = new HttpClientFactory.HttpClientFactory();
+            var sut = new HttpClientFactory();
 
             sut.Setup<HttpClientTest, HttpMessageHandlerTest>();
 
@@ -189,7 +189,7 @@ namespace JMG.HttpClientFactoryTestsF
         [Test]
         public void CreatesTypedInstanceWithoutPriorSetup()
         {
-            var sut = new HttpClientFactory.HttpClientFactory();
+            var sut = new HttpClientFactory();
 
             var result = sut.BuildAdHoc<HttpClientTest>();
 
@@ -199,7 +199,7 @@ namespace JMG.HttpClientFactoryTestsF
         [Test]
         public void CreatesFromDefaultInstanceFactory()
         {
-            var sut = HttpClientFactory.HttpClientFactory.Default;
+            var sut = HttpClientFactory.Default;
 
             var result = sut.Build();
 
@@ -209,7 +209,7 @@ namespace JMG.HttpClientFactoryTestsF
         [Test]
         public void CannotCreateUsingTypeNotSetPrior()
         {
-            var sut = new HttpClientFactory.HttpClientFactory();
+            var sut = new HttpClientFactory();
 
             Assert.Throws<Exception>(() => { sut.Build<HttpClientTest>(); });
         }
@@ -217,7 +217,7 @@ namespace JMG.HttpClientFactoryTestsF
         [Test]
         public void CannotCreateUsingNamedInstanceNotSetPrior()
         {
-            var sut = new HttpClientFactory.HttpClientFactory();
+            var sut = new HttpClientFactory();
 
             Assert.Throws<Exception>(() => { sut.Build("MyInstance"); });
         }
@@ -225,7 +225,7 @@ namespace JMG.HttpClientFactoryTestsF
         [Test]
         public void DefaultInstanceFactoryAndNewedUpFactoryDoNotShareConfig()
         {
-            var sut = new HttpClientFactory.HttpClientFactory();
+            var sut = new HttpClientFactory();
 
             sut.Setup<HttpClientTest>(new SlidingExpirationPolicy(TimeSpan.FromSeconds(2)));
 
@@ -234,7 +234,7 @@ namespace JMG.HttpClientFactoryTestsF
             Assert.IsNotNull(client);
 
 
-            var sutDefault = HttpClientFactory.HttpClientFactory.Default;
+            var sutDefault = HttpClientFactory.Default;
 
             Assert.Throws<Exception>(() => { sutDefault.Build<HttpClientTest>(); });
         }
@@ -242,7 +242,7 @@ namespace JMG.HttpClientFactoryTestsF
         [Test]
         public async Task ReusesTheSameInstanceOfHandlerForDefaultPolicy()
         {
-            var sut = new HttpClientFactory.HttpClientFactory();
+            var sut = new HttpClientFactory();
 
             sut.Setup(
                     (handler) => new HttpClientTest(handler),
@@ -266,7 +266,7 @@ namespace JMG.HttpClientFactoryTestsF
         [Test]
         public async Task CreatesNewInstanceOfHandlerWhenPolicyDictates()
         {
-            var sut = new HttpClientFactory.HttpClientFactory();
+            var sut = new HttpClientFactory();
 
             sut.Setup(
                     (handler) => new HttpClientTest(handler),
@@ -290,7 +290,7 @@ namespace JMG.HttpClientFactoryTestsF
         [Test]
         public async Task DisposingClientDoesNotDisposeMessageHandler()
         {
-            var sut = new HttpClientFactory.HttpClientFactory();
+            var sut = new HttpClientFactory();
 
             sut.Setup(
                     (handler) => new HttpClientTest(handler),
@@ -329,7 +329,7 @@ namespace JMG.HttpClientFactoryTestsF
         [Test]
         public async Task DisposingClientDoesNotDisposeClientHandler()
         {
-            var sut = new HttpClientFactory.HttpClientFactory();
+            var sut = new HttpClientFactory();
 
             sut.Setup(
                     (handler) => new HttpClientTest(handler),

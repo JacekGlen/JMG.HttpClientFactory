@@ -9,9 +9,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortExhaustionPresentationF
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PortExhaustionPresentationCore", "PortExhaustionPresentationCore\PortExhaustionPresentationCore.csproj", "{72A34FF7-C333-4A15-92A3-6FD997AE39F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JMG.HttpClientFactoryTests", "JMG.HttpClientFactoryTests\JMG.HttpClientFactoryTests.csproj", "{DA4B52DA-2C24-4170-86F8-446F3F942A50}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JMG.HttpClientFactory.Tests", "JMG.HttpClientFactory.Tests\JMG.HttpClientFactory.Tests.csproj", "{DA4B52DA-2C24-4170-86F8-446F3F942A50}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JMG.HttpClientFactory.Benchmark", "JMG.HttpClientFactory.Benchmark\JMG.HttpClientFactory.Benchmark.csproj", "{DFB237CF-5262-4ECD-852D-82442B6E5A57}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JMG.HttpClientFactory.Benchmark", "JMG.HttpClientFactory.Benchmark\JMG.HttpClientFactory.Benchmark.csproj", "{DFB237CF-5262-4ECD-852D-82442B6E5A57}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

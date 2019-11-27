@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Net.Http;
 using System.Text;
 
-namespace JMG.HttpClientFactoryTestsF
+namespace JMG.HttpClientFactory.Tests
 {
     [TestFixture]
     public class PerformanceTest
@@ -28,7 +28,7 @@ namespace JMG.HttpClientFactoryTestsF
             var orignalClientCreatingTime = timer.Elapsed;
             TestContext.WriteLine($"HttpClient instance creation executed in {orignalClientCreatingTime}");
 
-            var sut = new HttpClientFactory.HttpClientFactory();
+            var sut = new HttpClientFactory();
             sut.Build();
 
             Action b = () => { sut.Build(); };
