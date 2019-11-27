@@ -1,0 +1,3 @@
+﻿In order to run benchmarks you need target frameworks installe on your machine. Please edit `<TargetFrameworks>` in the `JMG.HttpClientFactory.Benchmark.csproj` file to adjust to you local environment.
+
+Running the test multiple times, one after another, might lead to errors and some tests failing to complete. This is due to port exhaustion phenomenon caused by new instance tests. You can comment them out as required.

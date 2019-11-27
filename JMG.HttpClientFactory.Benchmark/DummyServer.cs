@@ -33,7 +33,7 @@ namespace JMG.HttpClientFactory.Benchmark
             var context = listener.EndGetContext(ar);
             listener.BeginGetContext(Callback, null);
             var now = DateTime.UtcNow;
-            var responseStr = "{ \"mesage\": \"Dick Laurent Is Dead\" }";
+            var responseStr = "{ \"message\": \"Dick Laurent Is Dead\" }";
             byte[] buffer = Encoding.UTF8.GetBytes(responseStr);
             var response = context.Response;
             response.ContentType = "text/json";
