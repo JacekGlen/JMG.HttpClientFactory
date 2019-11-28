@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "PortExhaustionPresentationCore": {
+      "commandName": "Project",
+      "commandLineArgs": "static"
+    }
+  }
+}
