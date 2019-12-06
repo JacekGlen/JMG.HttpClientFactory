@@ -13,7 +13,7 @@ namespace JMG.HttpClientFactory
         {
             if (instanceTime.Ticks <= 0)
             {
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(instanceTime));
             }
 
             _singleInstanceTime = instanceTime;

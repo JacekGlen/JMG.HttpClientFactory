@@ -13,7 +13,7 @@ namespace JMG.HttpClientFactory
         {
             if (maxCallsPerInstance <= 0)
             {
-                throw new ArgumentException();
+                throw new ArgumentOutOfRangeException(nameof(maxCallsPerInstance));
             }
 
             _maxCallsPerInstance = maxCallsPerInstance;

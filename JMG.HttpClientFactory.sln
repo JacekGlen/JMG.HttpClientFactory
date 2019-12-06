@@ -5,9 +5,7 @@ VisualStudioVersion = 16.0.29326.143
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JMG.HttpClientFactory", "JMG.HttpClientFactory\JMG.HttpClientFactory.csproj", "{00E7ADBB-43A7-482F-B1BF-4AD720CC621D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortExhaustionPresentationFramework", "PortExhaustionPresentationFramework\PortExhaustionPresentationFramework.csproj", "{0827BB8B-E050-47A5-8A98-B1B1DBE4C86E}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PortExhaustionPresentationCore", "PortExhaustionPresentationCore\PortExhaustionPresentationCore.csproj", "{72A34FF7-C333-4A15-92A3-6FD997AE39F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PortExhaustionPresentation", "PortExhaustionPresentation\PortExhaustionPresentation.csproj", "{72A34FF7-C333-4A15-92A3-6FD997AE39F0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JMG.HttpClientFactory.Tests", "JMG.HttpClientFactory.Tests\JMG.HttpClientFactory.Tests.csproj", "{DA4B52DA-2C24-4170-86F8-446F3F942A50}"
 EndProject

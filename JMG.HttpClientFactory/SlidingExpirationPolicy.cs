@@ -11,7 +11,7 @@ namespace JMG.HttpClientFactory
         {
             if (slidingWindow.Ticks <= 0)
             {
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(slidingWindow));
             }
 
             _slidingWindow = slidingWindow;
