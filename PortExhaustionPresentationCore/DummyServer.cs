@@ -44,7 +44,10 @@ namespace PortExhaustionPresentationFramework
             response.StatusCode = 200;
             response.OutputStream.Write(buffer, 0, buffer.Length);
             response.OutputStream.Close();
-            context.Response.Close();
+
+            //This causes the server to send FIN which automatically closes the port on the client side.
+            //That's not a usual behavior for the most of TCP/IP communication, hence it's commented out.
+            //context.Response.Close();
         }
     }
 }
